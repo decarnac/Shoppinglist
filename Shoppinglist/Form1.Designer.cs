@@ -41,6 +41,7 @@ namespace Shoppinglist
             this.läsInUrklippTextBox = new System.Windows.Forms.RichTextBox();
             this.inköpslistaTextBox = new System.Windows.Forms.RichTextBox();
             this.läggtillingrediensBox = new System.Windows.Forms.GroupBox();
+            this.changeingredientButton = new System.Windows.Forms.Button();
             this.läsinurklippButton = new System.Windows.Forms.Button();
             this.mängdTextBox = new System.Windows.Forms.TextBox();
             this.mängdLabel = new System.Windows.Forms.Label();
@@ -54,7 +55,6 @@ namespace Shoppinglist
             this.Namn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Antal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Mått = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.button1 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -154,7 +154,7 @@ namespace Shoppinglist
             // 
             // läggtillingrediensBox
             // 
-            this.läggtillingrediensBox.Controls.Add(this.button1);
+            this.läggtillingrediensBox.Controls.Add(this.changeingredientButton);
             this.läggtillingrediensBox.Controls.Add(this.läsinurklippButton);
             this.läggtillingrediensBox.Controls.Add(this.mängdTextBox);
             this.läggtillingrediensBox.Controls.Add(this.mängdLabel);
@@ -170,6 +170,17 @@ namespace Shoppinglist
             this.läggtillingrediensBox.TabIndex = 0;
             this.läggtillingrediensBox.TabStop = false;
             this.läggtillingrediensBox.Text = "Lägg till ingrediens";
+            // 
+            // changeingredientButton
+            // 
+            this.changeingredientButton.Location = new System.Drawing.Point(527, 43);
+            this.changeingredientButton.Name = "changeingredientButton";
+            this.changeingredientButton.Size = new System.Drawing.Size(75, 23);
+            this.changeingredientButton.TabIndex = 8;
+            this.changeingredientButton.TabStop = false;
+            this.changeingredientButton.Text = "Change Ingredient";
+            this.changeingredientButton.UseVisualStyleBackColor = true;
+            this.changeingredientButton.Click += new System.EventHandler(this.changeingredientButton_Click);
             // 
             // läsinurklippButton
             // 
@@ -292,16 +303,6 @@ namespace Shoppinglist
             this.Mått.Name = "Mått";
             this.Mått.Width = 53;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(527, 43);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 8;
-            this.button1.TabStop = false;
-            this.button1.Text = "Change Ingredient";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -360,7 +361,7 @@ namespace Shoppinglist
         private System.Windows.Forms.Button läsinurklippButton;
 
         private parseIngredientDlg parseIngredientsDlg;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button changeingredientButton;
     }
 }
 

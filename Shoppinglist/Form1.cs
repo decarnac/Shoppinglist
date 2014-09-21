@@ -91,9 +91,17 @@ namespace Shoppinglist
 
         private void ingrediensComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Ingredient selectedIngredient = ingrediensComboBox.SelectedItem as Ingredient;
-            måttComboBox.Text = selectedIngredient.Measurement;
-            mängdTextBox.Text = selectedIngredient.Amount.ToString();
+            try
+            {
+                Ingredient selectedIngredient = ingrediensComboBox.SelectedItem as Ingredient;
+                måttComboBox.Text = selectedIngredient.Measurement;
+                mängdTextBox.Text = selectedIngredient.Amount.ToString();
+            }
+            catch (Exception ex)
+            {
+                måttComboBox.Text = "1";
+                mängdTextBox.Text = "st";
+            }
         }   
 
         private void mängdComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -164,8 +172,8 @@ namespace Shoppinglist
                             iterIngredient.NamePlural == rowParts[0])
                         {
                             currentRow.Name = iterIngredient.Name;
-                            iterIngredient.NamePlural = iterIngredient.NamePlural;
-                            iterIngredient.Category = iterIngredient.Category;
+                            currentRow.NamePlural = iterIngredient.NamePlural;
+                            currentRow.Category = iterIngredient.Category;
                             isValidIngredient = true;
                             Shoppinglistan.listan.Add(new Ingredient(currentRow));
                             break;
@@ -175,6 +183,8 @@ namespace Shoppinglist
                     // fix to else perhaps
                 else if (rowParts.Length > 1)
                 {
+
+                    // fix me när ingrediens + amount men inte measurement finns
                     if (fixMeasurement(rowParts[rowParts.Length - 1], ref rowParts) != returnvalue.eStringNotFound)
                     {
                         //foreach (string rowPart in rowParts)
@@ -420,6 +430,92 @@ namespace Shoppinglist
                 }
             }
             return returnvalue.eStringNotFound;
+        }
+
+        private void changeingredientButton_Click(object sender, EventArgs e)
+        {
+            parseIngredientsDlg = new parseIngredientDlg();
+            parseIngredientsDlg.setCategoryAlternatives(Kategorilistan.listan);
+            parseIngredientsDlg.setIngredientAlternatives(Ingredienslistan.listan);
+            parseIngredientsDlg.setMeasurementAlternatives(Måttlistan.listan);
+
+            Ingredient ingredient;
+
+            Predicate<Ingredient> ingrediensFinder = (Ingredient p) =>
+            {
+                return p.Name == ingrediensComboBox.Text;
+            };
+            try
+            {
+                ingredient = Ingredienslistan.listan.Find(ingrediensFinder);
+
+                if (ingredient != null)
+                {
+                    parseIngredientsDlg.setUnknownIngredient("");
+                    parseIngredientsDlg.setIngredientText(ingredient.Name);
+                    parseIngredientsDlg.setPluralNameText(ingredient.NamePlural);
+                    parseIngredientsDlg.setCategoryText(ingredient.Category);
+                    parseIngredientsDlg.setMeasurementText(ingredient.Measurement);
+                    parseIngredientsDlg.setAmountValue(1);
+                    parseIngredientsDlg.setExtraInfo("");
+                }
+                else
+                {
+                    parseIngredientsDlg.setUnknownIngredient("");
+                    parseIngredientsDlg.setIngredientText(ingrediensComboBox.Text);
+                    parseIngredientsDlg.setPluralNameText("");
+                    parseIngredientsDlg.setCategoryText("");
+                    parseIngredientsDlg.setMeasurementText("st");
+                    parseIngredientsDlg.setAmountValue(1);
+                    parseIngredientsDlg.setExtraInfo("");
+                }
+                
+                parseIngredientsDlg.StartPosition = FormStartPosition.CenterScreen;
+                parseIngredientsDlg.ShowDialog();
+                
+                if (parseIngredientsDlg.DialogResult == DialogResult.OK)
+                {
+                    Predicate<Ingredient> ingrediensFinder2 = (Ingredient p) =>
+                    {
+                        return p.Name == parseIngredientsDlg.getIngredientText();
+                    };
+
+                    Ingredient ingredientUpdated = Ingredienslistan.listan.Find(ingrediensFinder2);
+
+                    if (ingredientUpdated == null)
+                    {
+                        ingredientUpdated = new Ingredient( parseIngredientsDlg.getIngredientText(), 
+                                                            parseIngredientsDlg.getPluralNameText(), 
+                                                            float.Parse(parseIngredientsDlg.getAmountValue()), 
+                                                            parseIngredientsDlg.getMeasurementText(),
+                                                            parseIngredientsDlg.getCategoryText(),
+                                                            parseIngredientsDlg.getExtraInfo());
+
+                        Ingredienslistan.listan.Add(ingredientUpdated);
+                        
+                        ingrediensComboBox.ResetText();
+
+                        ingrediensComboBox.DataSource = null;
+                        ingrediensComboBox.DataSource = Ingredienslistan.listan;
+                        ingrediensComboBox.DisplayMember = "Name";
+                    }
+                    else
+                    {
+                        ingredient.Name         = parseIngredientsDlg.getIngredientText();
+                        ingredient.NamePlural   = parseIngredientsDlg.getPluralNameText(); 
+                        ingredient.Amount       = float.Parse(parseIngredientsDlg.getAmountValue());
+                        ingredient.Measurement  = parseIngredientsDlg.getMeasurementText();
+                        ingredient.Category     = parseIngredientsDlg.getCategoryText();
+                        ingredient.AdditionalInfo = parseIngredientsDlg.getExtraInfo();
+                    }
+                    
+                    Ingredienslistan.Save();
+                }
+            }
+            catch (Exception ex)
+            {
+                
+            }
         }
     }
 }
