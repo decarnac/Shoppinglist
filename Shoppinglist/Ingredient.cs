@@ -72,7 +72,6 @@ namespace Shoppinglist
             AdditionalInfo = (AdditionalInfo != "") ? ( "(" + AdditionalInfo + ")" ) : AdditionalInfo;
             return (Name + AdditionalInfo + " " + Amount + " " + Measurement);
         }
-
     }
 
     
