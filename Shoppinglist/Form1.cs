@@ -36,14 +36,14 @@ namespace Shoppinglist
             //ingrediensComboBox.Items.Add("persilja");
             //ingrediensComboBox.Items.Add("purjolök");
 
-            //Ingredienslistan.listan = new List<Ingrediens>{new Ingrediens("paprika", 1, "st"),
+            //Ingredienslistan.theList = new List<Ingrediens>{new Ingrediens("paprika", 1, "st"),
             //                                    new Ingrediens("peppar", 20, "g"),
             //                                    new Ingrediens("persilja", 2, "l"),
             //                                    new Ingrediens("purjolök", 1, "st") };
 
             
 
-            //Måttlistan.listan = new List<Mått>{new Mått("dl"),
+            //Måttlistan.theList = new List<Mått>{new Mått("dl"),
             //                                    new Mått("g"),
             //                                    new Mått("st"),
             //                                    new Mått("l") };
@@ -56,14 +56,14 @@ namespace Shoppinglist
             Måttlistan.Save();
 
 
-            ingrediensComboBox.DataSource = Ingredienslistan.listan;
+            ingrediensComboBox.DataSource = Ingredienslistan.theList;
             ingrediensComboBox.DisplayMember = "Name";
 
             //mängdComboBox.DataSource = Kategorilistan.DataSource;
             //mängdComboBox.DisplayMember = "Mängd";
             mängdTextBox.Text = "1";
 
-            måttComboBox.DataSource = Måttlistan.listan;
+            måttComboBox.DataSource = Måttlistan.theList;
             måttComboBox.DisplayMember = "Name";
 
             //ingrediensComboBox.Text = "persilja";
@@ -116,9 +116,9 @@ namespace Shoppinglist
 
         private void läggtillingrediensButton_Click(object sender, EventArgs e)
         {
-            Shoppinglistan.listan.Add(new Ingredient(ingrediensComboBox.Text, "", /*mängdTextBox.Text*/ 1, måttComboBox.Text, "", ""));
+            Shoppinglistan.theList.Add(new Ingredient(ingrediensComboBox.Text, "", /*mängdTextBox.Text*/ 1, måttComboBox.Text, "", ""));
             inköpslistaTextBox.Clear();
-            //inköpslistaTextBox.AppendText(Shoppinglistan.listan.ElementAt(0).serialize());
+            //inköpslistaTextBox.AppendText(Shoppinglist.theList.ElementAt(0).serialize());
         }
 
         private void läsInUrklippButton_Click(object sender, EventArgs e)
@@ -140,14 +140,16 @@ namespace Shoppinglist
 
 
             parseIngredientsDlg = new parseIngredientDlg();
-            parseIngredientsDlg.setCategoryAlternatives(Kategorilistan.listan);
-            parseIngredientsDlg.setIngredientAlternatives(Ingredienslistan.listan);
-            parseIngredientsDlg.setMeasurementAlternatives(Måttlistan.listan);
+            parseIngredientsDlg.setCategoryAlternatives(Kategorilistan.theList);
+            parseIngredientsDlg.setIngredientAlternatives(Ingredienslistan.theList);
+            parseIngredientsDlg.setMeasurementAlternatives(Måttlistan.theList);
 
-            char[] splitRowDelimiter = new char[] { ' ', '\n' };
+            char[] splitRowDelimiter = new char[] { ' ', '(', ')', '[', ']', '.', ',', '\n' };
 
             Ingredient currentRow = new Ingredient("", "", 1, "st", "", "");
+            
             List<string> name_and_extras = new List<string>();
+            
             inköpslistaTextBox.ResetText();
 
             for (int i = 0; i < rows.Length; i++)
@@ -157,6 +159,7 @@ namespace Shoppinglist
                 string[] rowParts = rows[i].Split(splitRowDelimiter, StringSplitOptions.RemoveEmptyEntries);
 
                 bool isValidIngredient = false;
+                bool foundDuplicate = false;
 
                 if (rowParts.Length == 0)
                 {
@@ -165,190 +168,156 @@ namespace Shoppinglist
                 }
                 else if (rowParts.Length == 1)
                 {
-                    
-                    foreach (Ingredient iterIngredient in Ingredienslistan.listan)
+                    currentRow.Amount = 1;
+                    currentRow.Measurement = "st";
+                    currentRow.AdditionalInfo = "";
+                    currentRow.Name = rowParts[0];
+                    currentRow.NamePlural = rowParts[0];
+                    currentRow.Category = "";
+
+                    List<Ingredient> ingredientSearch = Ingredienslistan.FindByName(rowParts[0]);
+
+                    if (ingredientSearch.Count > 0)
                     {
-                        if (iterIngredient.Name == rowParts[0] ||
-                            iterIngredient.NamePlural == rowParts[0])
-                        {
-                            currentRow.Name = iterIngredient.Name;
-                            currentRow.NamePlural = iterIngredient.NamePlural;
-                            currentRow.Category = iterIngredient.Category;
-                            isValidIngredient = true;
-                            Shoppinglistan.listan.Add(new Ingredient(currentRow));
-                            break;
-                        }
+                        currentRow.Name = ingredientSearch[0].Name;
+                        currentRow.NamePlural = ingredientSearch[0].NamePlural;
+                        currentRow.Category = ingredientSearch[0].Category;
+
+                        isValidIngredient = true;
+                        Shoppinglistan.theList.Add(new Ingredient(currentRow));
+
                     }
                 }
-                    // fix to else perhaps
                 else if (rowParts.Length > 1)
                 {
+                    // Try to find Amount and Measurement
+                    float ingredientAmount = 1;
+                    string ingredientMeasurement = "st";
 
-                    // fix me när ingrediens + amount men inte measurement finns
-                    if (fixMeasurement(rowParts[rowParts.Length - 1], ref rowParts) != returnvalue.eStringNotFound)
+                    int partIndex = 0;
+                    foreach (string part in rowParts)
                     {
-                        //foreach (string rowPart in rowParts)
-                        //{
-                        //    string text1 = "21";
-                        //    float num1;
-                        //    bool res = float.TryParse(text1, out num1);
-                        //    if (res == false)
-                        //    {
-                        //        int temp = 0;
-                        //        // String is not a number.
-                        //    }
-                        //}
-                        float ingredientAmount;
-
-                        if (float.TryParse(rowParts[rowParts.Length - 2], out ingredientAmount))
+                        List<Measurement> measurementSearch = Måttlistan.FindByName(part);
+                        List<string> substringSearch = Måttlistan.FindByNameSubString(part);
+                        
+                        if( measurementSearch.Count > 0 )
                         {
-                            currentRow.Name = "";
-                            currentRow.Amount = ingredientAmount;
-                            currentRow.Measurement = rowParts[rowParts.Length - 1];
-                            currentRow.Category = "";
-                            currentRow.NamePlural = "";
-                            currentRow.AdditionalInfo = "";
+                            ingredientMeasurement = part;
 
-                            name_and_extras.Clear();
-
-                            for (int j = 0; j <= (rowParts.Length - 3); j++)
+                            float searchAmount;
+                            if(measurementSearch.Count < partIndex)
                             {
-                                name_and_extras.Add(rowParts[j]);
-                                //currentRow.Name += (" " + rowParts[j]);
-                            }
-
-                            foreach (Ingredient ingrediens in Ingredienslistan.listan)
-                            {
-                                bool isIngredientFound = false;
-                                currentRow.AdditionalInfo = "";
-                                foreach (string searchstring in name_and_extras)
+                                if (float.TryParse(rowParts[partIndex - 1], out searchAmount))
                                 {
-                                    if (ingrediens.Name == searchstring || ingrediens.NamePlural == searchstring)
-                                    {
-                                        currentRow.Name = ingrediens.Name;
-                                        currentRow.NamePlural = ingrediens.NamePlural;
-                                        isIngredientFound = true;
-                                    }
-                                    else
-                                    {
-                                        if (currentRow.AdditionalInfo != "")
-                                        {
-                                            currentRow.AdditionalInfo += " ";
-                                        }
-                                        currentRow.AdditionalInfo += searchstring;
-                                    }
-                                }
-                                if (isIngredientFound &&
-                                    ingrediens.Measurement == currentRow.Measurement)
-                                {
-                                    currentRow.Category = ingrediens.Category;
-
-                                    bool foundDuplicate = false;
-                                    foreach (Ingredient iterIngredient in Shoppinglistan.listan)
-                                    {
-                                        if (iterIngredient.Name == currentRow.Name &&
-                                            iterIngredient.NamePlural == currentRow.NamePlural &&
-                                            iterIngredient.Category == currentRow.Category &&
-                                            iterIngredient.AdditionalInfo == currentRow.AdditionalInfo &&
-                                            iterIngredient.Measurement == currentRow.Measurement)
-                                        {
-                                            iterIngredient.Amount += currentRow.Amount;
-                                            foundDuplicate = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!foundDuplicate)
-                                    {
-                                        Shoppinglistan.listan.Add(new Ingredient(currentRow));
-                                    }
-
-
-
-                                    isValidIngredient = true;
-
+                                    ingredientAmount = searchAmount;
                                     break;
                                 }
-                                else
-                                {
-                                    int stophere = 00;
-                                }
-
-                                //if (ingrediens.Name == currentRow.Name &&
-                                //    ingrediens.Measurement == currentRow.Measurement)
-                                //{
-                                //    currentRow.NamePlural = ingrediens.NamePlural;
-
-                                //    currentRow.Category = ingrediens.Category;
-                                //    Shoppinglistan.listan.Add(new Ingredient(currentRow));
-
-                                //    isValidIngredient = true;
-
-                                //    break;
-                                //}
-                                //else if(currentRow.Name.Contains(ingrediens.Name) &&
-                                //        ingrediens.Measurement == currentRow.Measurement)
-                                //{
-                                //    currentRow.AdditionalInfo = currentRow.Name.Replace(ingrediens.Name, "");
-
-                                //    currentRow.Name = ingrediens.Name;
-
-                                //    currentRow.NamePlural = ingrediens.NamePlural;
-
-                                //    currentRow.Category = ingrediens.Category;
-
-                                //    Shoppinglistan.listan.Add(new Ingredient(currentRow));
-
-                                //    isValidIngredient = true;
-
-                                //    break;
-                                //}
-                                //else if(ingrediens.NamePlural != "" &&
-                                //        ingrediens.NamePlural == currentRow.Name &&
-                                //        ingrediens.Measurement == currentRow.Measurement)
-                                //{
-                                //    currentRow.Name = ingrediens.Name;
-                                //    currentRow.NamePlural = ingrediens.NamePlural;
-
-                                //    currentRow.Category = ingrediens.Category;
-
-                                //    Shoppinglistan.listan.Add(new Ingredient(currentRow));
-
-                                //    isValidIngredient = true;
-
-                                //    break;
-                                //}
-                                //else if (ingrediens.NamePlural != "" &&
-                                //        currentRow.Name.Contains(ingrediens.NamePlural) &&
-                                //        ingrediens.Measurement == currentRow.Measurement)
-                                //{
-                                //    try
-                                //    {
-                                //        currentRow.AdditionalInfo = currentRow.Name.Replace(ingrediens.NamePlural, "");
-                                //    }
-                                //    catch (Exception ex)
-                                //    {
-                                //        currentRow.AdditionalInfo = "";
-                                //    }
-                                //    currentRow.Name = ingrediens.Name;
-                                //    currentRow.NamePlural = ingrediens.NamePlural;
-
-
-
-                                //    currentRow.Category = ingrediens.Category;
-
-                                //    Shoppinglistan.listan.Add(new Ingredient(currentRow));
-
-                                //    isValidIngredient = true;
-
-                                //    break;
-                                // }
                             }
+                            
+                        }
+                        else if (substringSearch.Count > 0)
+                        {
+                            float searchAmount;
+                            if (float.TryParse(substringSearch[1], out searchAmount))
+                            {
+                                ingredientMeasurement = substringSearch[0];
+                                ingredientAmount = searchAmount;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            float searchAmount;
+                            if (float.TryParse(part, out searchAmount))
+                            {
+                                ingredientAmount = searchAmount;
+                            }
+                        }
+                        partIndex++;
+                    }
+
+                    
+                    // Setup some default values
+                    currentRow.Name = "";
+                    currentRow.Amount = ingredientAmount;
+                    currentRow.Measurement = ingredientMeasurement;
+                    currentRow.Category = "";
+                    currentRow.NamePlural = "";
+                    currentRow.AdditionalInfo = "";
+
+                    name_and_extras.Clear();
+
+                    // setup the array of words remaining after measurement and amount was removed.
+                    for (int j = 0; j < (rowParts.Length); j++)
+                    {
+                        if (rowParts[j] != ingredientMeasurement &&
+                            rowParts[j] != ingredientAmount.ToString() &&
+                            rowParts[j] != (ingredientMeasurement + ingredientAmount.ToString()) &&
+                            rowParts[j] != (ingredientAmount.ToString() + ingredientMeasurement)
+                            )
+                        {
+                            name_and_extras.Add(rowParts[j]);
+                        }
+                    }
+
+                    
+
+                    currentRow.AdditionalInfo = "";
+                    
+                    foreach (string searchstring in name_and_extras)
+                    {
+                        // Find Ingredient/s with same name
+                        List<Ingredient> searchIngredients = Ingredienslistan.FindByName(searchstring);
+
+                        if (searchIngredients.Count > 0)
+                        {
+                            isValidIngredient = true;
+
+                            // Also match Measurement
+                            Ingredient useThisIngredient = searchIngredients[0];
+                            foreach(Ingredient ingredientIter in searchIngredients)
+                            {
+                                if (ingredientIter.Measurement == currentRow.Measurement)
+                                {
+                                    useThisIngredient = ingredientIter;
+                                    break;
+                                }
+                            }
+
+                            currentRow.Name = useThisIngredient.Name;
+                            currentRow.NamePlural = useThisIngredient.NamePlural;
+                            currentRow.Category = useThisIngredient.Category;
+
+                            foreach (Ingredient iterIngredient in Shoppinglistan.theList)
+                            {
+                                if (iterIngredient.Name == currentRow.Name &&
+                                    iterIngredient.NamePlural == currentRow.NamePlural &&
+                                    iterIngredient.Category == currentRow.Category &&
+                                    iterIngredient.AdditionalInfo == currentRow.AdditionalInfo &&
+                                    iterIngredient.Measurement == currentRow.Measurement)
+                                {
+                                    iterIngredient.Amount += currentRow.Amount;
+                                    foundDuplicate = true;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (currentRow.AdditionalInfo != "")
+                            {
+                                currentRow.AdditionalInfo += " ";
+                            }
+                            currentRow.AdditionalInfo += searchstring;
                         }
                     }
                 }
-                
-                if (!isValidIngredient)
+
+                if (isValidIngredient && !foundDuplicate)
+                {
+                    Shoppinglistan.theList.Add(new Ingredient(currentRow));
+                }
+                else if (!isValidIngredient)
                 {
                     parseIngredientsDlg.resetForm();
                     parseIngredientsDlg.setUnknownIngredient(rows[i]);
@@ -357,7 +326,7 @@ namespace Shoppinglist
                     parseIngredientsDlg.setCategoryText(currentRow.Category);
                     parseIngredientsDlg.setMeasurementText(currentRow.Measurement);
                     parseIngredientsDlg.setAmountValue(currentRow.Amount);
-                    parseIngredientsDlg.setExtraInfo("");
+                    parseIngredientsDlg.setExtraInfo(currentRow.AdditionalInfo);
 
                     parseIngredientsDlg.StartPosition = FormStartPosition.CenterScreen;
                     
@@ -371,9 +340,9 @@ namespace Shoppinglist
                         currentRow.Measurement      = parseIngredientsDlg.getMeasurementText();
                         currentRow.AdditionalInfo   = parseIngredientsDlg.getExtraInfo();
                         
-                        Shoppinglistan.listan.Add(new Ingredient(currentRow));
+                        Shoppinglistan.theList.Add(new Ingredient(currentRow));
 
-                        Ingredienslistan.listan.Add(new Ingredient(currentRow));
+                        Ingredienslistan.theList.Add(new Ingredient(currentRow));
                     }
                     else
                     {
@@ -384,12 +353,12 @@ namespace Shoppinglist
             }
 
             // Sortera inköpslistan i alfabetisk ordning
-            var ingredients = from ingredient in Shoppinglistan.listan
+            var ingredients = from ingredient in Shoppinglistan.theList
                               orderby ingredient.Name
                               select ingredient;
 
             inköpslistaTextBox.Clear();
-            foreach (Category category in Kategorilistan.listan)
+            foreach (Category category in Kategorilistan.theList)
             {
                 string categoryHeader = "", ingredientsInCategory = "";
                 categoryHeader = (category.Name + "\n" + "--------------------" + "\n");
@@ -405,39 +374,39 @@ namespace Shoppinglist
                     inköpslistaTextBox.AppendText(categoryHeader + ingredientsInCategory);
                 }
             }
-            Shoppinglistan.listan.Clear();
+            Shoppinglistan.theList.Clear();
             Ingredienslistan.Save();
         }
 
-        private returnvalue fixMeasurement(string target, ref string [] source)
-        {
-            foreach (Measurement measureIterator1 in Måttlistan.listan)
-            {
-                if (target == measureIterator1.Name)
-                {
-                    return returnvalue.eStringIdentical;
-                }
-                else 
-                {
-                    if (target.Contains(measureIterator1.Name))
-                    {
-                        string temp = target.Replace(measureIterator1.Name, "");
-                        Array.Resize(ref source, source.Length + 1);
-                        source[source.Length-2] = temp;
-                        source[source.Length-1] = measureIterator1.Name;
-                        return returnvalue.eStringSubString;
-                    }
-                }
-            }
-            return returnvalue.eStringNotFound;
-        }
+            //private returnvalue fixMeasurement(string target, ref string [] source)
+            //{
+            //    foreach (Measurement measureIterator1 in Måttlistan.theList)
+            //    {
+            //        if (target == measureIterator1.Name)
+            //        {
+            //            return returnvalue.eStringIdentical;
+            //        }
+            //        else 
+            //        {
+            //            if (target.Contains(measureIterator1.Name))
+            //            {
+            //                string temp = target.Replace(measureIterator1.Name, "");
+            //                Array.Resize(ref source, source.Length + 1);
+            //                source[source.Length-2] = temp;
+            //                source[source.Length-1] = measureIterator1.Name;
+            //                return returnvalue.eStringSubString;
+            //            }
+            //        }
+            //    }
+            //    return returnvalue.eStringNotFound;
+            //}
 
         private void changeingredientButton_Click(object sender, EventArgs e)
         {
             parseIngredientsDlg = new parseIngredientDlg();
-            parseIngredientsDlg.setCategoryAlternatives(Kategorilistan.listan);
-            parseIngredientsDlg.setIngredientAlternatives(Ingredienslistan.listan);
-            parseIngredientsDlg.setMeasurementAlternatives(Måttlistan.listan);
+            parseIngredientsDlg.setCategoryAlternatives(Kategorilistan.theList);
+            parseIngredientsDlg.setIngredientAlternatives(Ingredienslistan.theList);
+            parseIngredientsDlg.setMeasurementAlternatives(Måttlistan.theList);
 
             Ingredient ingredient;
 
@@ -447,7 +416,7 @@ namespace Shoppinglist
             };
             try
             {
-                ingredient = Ingredienslistan.listan.Find(ingrediensFinder);
+                ingredient = Ingredienslistan.theList.Find(ingrediensFinder);
 
                 if (ingredient != null)
                 {
@@ -480,7 +449,7 @@ namespace Shoppinglist
                         return p.Name == parseIngredientsDlg.getIngredientText();
                     };
 
-                    Ingredient ingredientUpdated = Ingredienslistan.listan.Find(ingrediensFinder2);
+                    Ingredient ingredientUpdated = Ingredienslistan.theList.Find(ingrediensFinder2);
 
                     if (ingredientUpdated == null)
                     {
@@ -491,12 +460,12 @@ namespace Shoppinglist
                                                             parseIngredientsDlg.getCategoryText(),
                                                             parseIngredientsDlg.getExtraInfo());
 
-                        Ingredienslistan.listan.Add(ingredientUpdated);
+                        Ingredienslistan.theList.Add(ingredientUpdated);
                         
                         ingrediensComboBox.ResetText();
 
                         ingrediensComboBox.DataSource = null;
-                        ingrediensComboBox.DataSource = Ingredienslistan.listan;
+                        ingrediensComboBox.DataSource = Ingredienslistan.theList;
                         ingrediensComboBox.DisplayMember = "Name";
                     }
                     else

@@ -24,26 +24,43 @@ namespace Shoppinglist
 
     class KategoriLista
     {
-        public List<Category> listan { get; set; }
+        public List<Category> theList { get; set; }
 
         public KategoriLista()
         {
             //Load();
         }
 
+        public List<Category> FindByName(string searchString)
+        {
+            List<Category> foundCategoriesList = new List<Category>();
+
+            foreach (Category iterCategory in theList)
+            {
+                if (iterCategory.Name == searchString)
+                {
+                    foundCategoriesList.Add(new Category(iterCategory));
+                }
+            }
+            return foundCategoriesList;
+        }
+
         public void Load()
         {
-            listan = new List<Category>();
+            theList = new List<Category>();
 
             Action<Exception> errorHandler = ( ex ) => 
             {
-                // Skapa grundkategorier
-                listan = new List<Category>{new Category("Bröd"),
+                // Create base categories
+                theList = new List<Category>{new Category("Apotek"),
+                                            new Category("Bröd"),
                                             new Category("Chark"),
+                                            new Category("Ost"),
                                             new Category("Frukt"),
                                             new Category("Grönsaker"),
                                             new Category("Mejeri"),
                                             new Category("Torrvaror"),
+                                            new Category("Skafferi"),
                                             new Category("Barn"),
                                             new Category("Godis & Snacks"),
                                             new Category("Städ & Tvätt"),
@@ -57,7 +74,7 @@ namespace Shoppinglist
                 using (Stream stream = File.Open("kategori.bin", FileMode.Open))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    listan = (List<Category>)bin.Deserialize(stream);
+                    theList = (List<Category>)bin.Deserialize(stream);
                 }
             }
             catch (IOException ex) { errorHandler(ex); }
@@ -71,7 +88,7 @@ namespace Shoppinglist
                 using (Stream stream = File.Open("kategori.bin", FileMode.Create))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    bin.Serialize(stream, listan);
+                    bin.Serialize(stream, theList);
                 }
             }
             catch (IOException)

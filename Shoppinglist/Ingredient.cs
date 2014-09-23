@@ -78,7 +78,7 @@ namespace Shoppinglist
     class IngrediensLista
     {
         //private List<Ingrediens> m_ingredienslistan;
-        public List<Ingredient> listan{ get; set;}
+        public List<Ingredient> theList{ get; set; }
 
         public IngrediensLista()
         {
@@ -87,17 +87,33 @@ namespace Shoppinglist
             //                                    new Ingrediens("persilja", 2, "l"),
             //                                    new Ingrediens("purjolök", 1, "st") };
             //Load();
-            listan = new List<Ingredient>();
+            theList = new List<Ingredient>();
         }
+
+        public List<Ingredient> FindByName(string searchString)
+        {
+            List<Ingredient> foundIngredientsList = new List<Ingredient>();
+
+            foreach (Ingredient iterIngredient in theList)
+            {
+                if (iterIngredient.Name == searchString ||
+                    iterIngredient.NamePlural == searchString)
+                {
+                    foundIngredientsList.Add(new Ingredient(iterIngredient));
+                }
+            }
+            return foundIngredientsList;
+        }
+
 
         public void Load()
         {
-            listan = new List<Ingredient>();
+            theList = new List<Ingredient>();
 
             Action<Exception> errorHandler = (ex) =>
             {
                 // Skapa grundingredienser
-                listan = new List<Ingredient>{  new Ingredient("paprika", "paprikor", 1, "st", "Grönsaker", ""),
+                theList = new List<Ingredient>{  new Ingredient("paprika", "paprikor", 1, "st", "Grönsaker", ""),
                                                 new Ingredient("peppar", "peppar", 20, "g", "Skafferi", ""),
                                                 new Ingredient("persilja", "persiljor", 2, "st", "Grönsaker", ""),
                                                 new Ingredient("tomat", "tomater", 2, "st", "Grönsaker", ""),
@@ -109,7 +125,7 @@ namespace Shoppinglist
                 using (Stream stream = File.Open("ingredienser.bin", FileMode.Open))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    listan = (List<Ingredient>)bin.Deserialize(stream);
+                    theList = (List<Ingredient>)bin.Deserialize(stream);
                 }
             }
 
@@ -125,7 +141,7 @@ namespace Shoppinglist
                 using (Stream stream = File.Open("ingredienser.bin", FileMode.Create))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    bin.Serialize(stream, listan);
+                    bin.Serialize(stream, theList);
                 }
             }
             catch (IOException)

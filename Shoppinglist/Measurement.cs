@@ -25,21 +25,53 @@ namespace Shoppinglist
 
     class MåttLista
     {
-        public List<Measurement> listan { get; set; }
+        public List<Measurement> theList { get; set; }
 
         public MåttLista()
         {
             //Load();
         }
 
+        // return all Measurements with this searchString name
+        public List<Measurement> FindByName(string searchString)
+        {
+            List<Measurement> foundMeasurementsList = new List<Measurement>();
+
+            foreach (Measurement iterMeasurement in theList)
+            {
+                if (iterMeasurement.Name == searchString)
+                {
+                    foundMeasurementsList.Add(new Measurement(iterMeasurement));
+                }
+            }
+            return foundMeasurementsList;
+        }
+
+        // Get first Measurement that is contained within searchString (return Measurement and the other part of the string)
+        public List<string> FindByNameSubString(string searchString)
+        {
+            List<string> foundMeasureAndTheRestList = new List<string>();
+
+            foreach (Measurement iterMeasurement in theList)
+            {
+                if (searchString.Contains(iterMeasurement.Name))
+                {
+                    foundMeasureAndTheRestList.Add(iterMeasurement.Name);
+                    foundMeasureAndTheRestList.Add(searchString.Replace(iterMeasurement.Name,""));
+                }
+            }
+            return foundMeasureAndTheRestList;
+        }
+
+
         public void Load()
         {
-            listan = new List<Measurement>();
+            theList = new List<Measurement>();
 
             Action<Exception> errorHandler = (ex) =>
             {
                 // Skapa grundkategorier
-                listan = new List<Measurement>{new Measurement("g"),
+                theList = new List<Measurement>{new Measurement("g"),
                                         new Measurement("hg"),
                                         new Measurement("kg"),
                                         new Measurement("tsk"),
@@ -56,7 +88,7 @@ namespace Shoppinglist
                 using (Stream stream = File.Open("mått.bin", FileMode.Open))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    listan = (List<Measurement>)bin.Deserialize(stream);  
+                    theList = (List<Measurement>)bin.Deserialize(stream);  
                 }
             }
 
@@ -71,7 +103,7 @@ namespace Shoppinglist
                 using (Stream stream = File.Open("mått.bin", FileMode.Create))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
-                    bin.Serialize(stream, listan);
+                    bin.Serialize(stream, theList);
                 }
             }
             catch (IOException)
