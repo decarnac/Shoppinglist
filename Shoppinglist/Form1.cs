@@ -263,7 +263,8 @@ namespace Shoppinglist
                     
 
                     currentRow.AdditionalInfo = "";
-                    
+                    // TODO
+                    // if searchstring contain more than 1 valid Ingredient then the first one will be discarded :/
                     foreach (string searchstring in name_and_extras)
                     {
                         // Find Ingredient/s with same name
