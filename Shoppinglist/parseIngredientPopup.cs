@@ -16,15 +16,15 @@ namespace Shoppinglist
             InitializeComponent();
             this.parseIngredientDlgAcceptBtn.DialogResult = DialogResult.OK;
             this.AcceptButton = this.parseIngredientDlgAcceptBtn;
-            
             this.CancelButton = this.parseIngredientDlgDiscardBtn;
         }
+
         public void resetForm()
         {
             parseIngredientDlgCategoryComboBox.SelectedIndex = -1;
             parseIngredientDlgIngredientsComboBox.Text = "";
 
-            parseIngredientDlgMeasurementComboBox.SelectedIndex = -1;
+            parseIngredientDlgUnitComboBox.SelectedIndex = -1;
 
             parseIngredientDlgAmountComboBox.Text = "1";
 
@@ -52,9 +52,10 @@ namespace Shoppinglist
         public void setCategoryAlternatives( List<Category> categories)
         {
             m_categories = new List<Category>(categories);
-            
+
+            parseIngredientDlgCategoryComboBox.DataSource = null;
             parseIngredientDlgCategoryComboBox.DataSource = m_categories;
-            parseIngredientDlgCategoryComboBox.DisplayMember = "Name";
+            parseIngredientDlgCategoryComboBox.DisplayMember = "m_name";
             parseIngredientDlgCategoryComboBox.SelectedIndex = -1;
         }
 
@@ -71,27 +72,29 @@ namespace Shoppinglist
         public void setIngredientAlternatives(List<Ingredient> ingredients)
         {
             m_ingredients = new List<Ingredient>(ingredients);
+            parseIngredientDlgIngredientsComboBox.DataSource = null;
             parseIngredientDlgIngredientsComboBox.DataSource = m_ingredients;
-            parseIngredientDlgIngredientsComboBox.DisplayMember = "Name";
+            parseIngredientDlgIngredientsComboBox.DisplayMember = "m_name";
             parseIngredientDlgIngredientsComboBox.SelectedIndex = -1;
         }
 
-        public void setMeasurementText(string Text)
+        public void setUnitText(string Text)
         {
-            parseIngredientDlgMeasurementComboBox.Text = Text;
+            parseIngredientDlgUnitComboBox.Text = Text;
         }
 
-        public string getMeasurementText()
+        public string getUnitText()
         {
-            return parseIngredientDlgMeasurementComboBox.Text;
+            return parseIngredientDlgUnitComboBox.Text;
         }
 
-        public void setMeasurementAlternatives(List<Measurement> measurement)
+        public void setUnitAlternatives(List<Unit> unit)
         {
-            m_measurement = new List<Measurement>(measurement);
-            parseIngredientDlgMeasurementComboBox.DataSource = m_measurement;
-            parseIngredientDlgMeasurementComboBox.DisplayMember = "Name";
-            parseIngredientDlgMeasurementComboBox.SelectedIndex = -1;
+            m_unit = new List<Unit>(unit);
+            parseIngredientDlgUnitComboBox.DataSource = null;
+            parseIngredientDlgUnitComboBox.DataSource = m_unit;
+            parseIngredientDlgUnitComboBox.DisplayMember = "m_name";
+            parseIngredientDlgUnitComboBox.SelectedIndex = -1;
         }
 
         public void setPluralNameText(string Text)
@@ -106,7 +109,7 @@ namespace Shoppinglist
 
         public void setAmountValue(float value)
         {
-            parseIngredientDlgAmountComboBox.Text = value.ToString(); ;
+            parseIngredientDlgAmountComboBox.Text = value.ToString();
         }
 
         public string getAmountValue()
@@ -133,9 +136,28 @@ namespace Shoppinglist
         {
             if ((parseIngredientDlgIngredientsComboBox.SelectedIndex < m_ingredients.Count) && (parseIngredientDlgIngredientsComboBox.SelectedIndex >= 0))
             {
-                parseIngredientDlgPluralNameTextBox.Text = m_ingredients.ElementAt(parseIngredientDlgIngredientsComboBox.SelectedIndex).NamePlural;
+                parseIngredientDlgPluralNameTextBox.Text = m_ingredients.ElementAt(parseIngredientDlgIngredientsComboBox.SelectedIndex).m_namePlural;
             }
         }
 
+        private void parseIngredientDlgIngredientsComboBox_Leave(object sender, EventArgs e)
+        {
+             parseIngredientDlgIngredientsComboBox.Text = parseIngredientDlgIngredientsComboBox.Text.Trim();
+        }
+        
+        private void parseIngredientDlgPluralNameTextBox_Leave(object sender, EventArgs e)
+        {
+            parseIngredientDlgPluralNameTextBox.Text = parseIngredientDlgPluralNameTextBox.Text.Trim();
+        }
+
+        private void parseIngredientDlgExtraInfoComboBox_Leave(object sender, EventArgs e)
+        {
+            parseIngredientDlgExtraInfoComboBox.Text = parseIngredientDlgExtraInfoComboBox.Text.Trim();
+        }
+
+        private void parseIngredientDlgAmountComboBox_Leave(object sender, EventArgs e)
+        {
+            parseIngredientDlgAmountComboBox.Text = parseIngredientDlgAmountComboBox.Text.Trim();
+        }
     }
 }

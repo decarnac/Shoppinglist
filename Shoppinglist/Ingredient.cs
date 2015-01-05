@@ -10,58 +10,58 @@ namespace Shoppinglist
     [Serializable()]
     public class Ingredient
     {
-        public Ingredient(string name, string nameplural, float amount, string measurement, string kat, string info)
+        public Ingredient(string name, string nameplural, float amount, string unit, string cat, string info)
         {
-            Name            = name;
-            NamePlural      = nameplural;
-            Amount          = amount;
-            Measurement     = measurement;
-            Category        = kat;
-            AdditionalInfo  = info;
+            m_name            = name;
+            m_namePlural      = nameplural;
+            m_amount          = amount;
+            m_unit            = unit;
+            m_category        = cat;
+            m_additionalInfo  = info;
         }
 
         public Ingredient(Ingredient ingrediens)
         {
-            Name            = ingrediens.Name;
-            NamePlural      = ingrediens.NamePlural;
-            Amount          = ingrediens.Amount;
-            Measurement     = ingrediens.Measurement;
-            Category        = ingrediens.Category;
-            AdditionalInfo  = ingrediens.AdditionalInfo;
+            m_name            = ingrediens.m_name;
+            m_namePlural      = ingrediens.m_namePlural;
+            m_amount          = ingrediens.m_amount;
+            m_unit            = ingrediens.m_unit;
+            m_category        = ingrediens.m_category;
+            m_additionalInfo  = ingrediens.m_additionalInfo;
         }
 
-        public string Name
+        public string m_name
         {
             get;
             set;
         }
 
-        public string NamePlural
+        public string m_namePlural
         {
             get;
             set;
         }
 
-        public float Amount
+        public float m_amount
         {
             get;
             set;
             
         }
 
-        public string Measurement
+        public string m_unit
         {
             get;
             set;
         }
 
-        public string Category
+        public string m_category
         {
             get;
             set;
         }
 
-        public string AdditionalInfo
+        public string m_additionalInfo
         {
             get;
             set;
@@ -69,35 +69,41 @@ namespace Shoppinglist
 
         public string serialize()
         {
-            AdditionalInfo = (AdditionalInfo != "") ? ( "(" + AdditionalInfo + ")" ) : AdditionalInfo;
-            return (Name + AdditionalInfo + " " + Amount + " " + Measurement);
+            m_additionalInfo = (m_additionalInfo != "") ? ( "(" + m_additionalInfo + ")" ) : m_additionalInfo;
+            return (m_name + m_additionalInfo + " " + m_amount + " " + m_unit);
         }
     }
 
     
-    class IngrediensLista
+    class IngredientList
     {
         //private List<Ingrediens> m_ingredienslistan;
         public List<Ingredient> theList{ get; set; }
 
-        public IngrediensLista()
+        public IngredientList()
         {
-            //listan = new List<Ingrediens>{new Ingrediens("paprika", 1, "st"),
-            //                                    new Ingrediens("peppar", 20, "g"),
-            //                                    new Ingrediens("persilja", 2, "l"),
-            //                                    new Ingrediens("purjolök", 1, "st") };
-            //Load();
             theList = new List<Ingredient>();
         }
 
+        // Sort
+        public void sortAlphabetical()
+        {
+            // Sort shoppinglist in alphabetical order
+            var ingredients = from ingredient in theList
+                              orderby ingredient.m_name
+                              select ingredient;
+            theList = ingredients.ToList();
+        }
+
+        // Find by exact name
         public List<Ingredient> FindByName(string searchString)
         {
             List<Ingredient> foundIngredientsList = new List<Ingredient>();
 
             foreach (Ingredient iterIngredient in theList)
             {
-                if (iterIngredient.Name == searchString ||
-                    iterIngredient.NamePlural == searchString)
+                if (iterIngredient.m_name == searchString ||
+                    iterIngredient.m_namePlural == searchString)
                 {
                     foundIngredientsList.Add(new Ingredient(iterIngredient));
                 }
@@ -122,7 +128,7 @@ namespace Shoppinglist
             
             try
             {
-                using (Stream stream = File.Open("ingredienser.bin", FileMode.Open))
+                using (Stream stream = File.Open("Ingredients.bin", FileMode.Open))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
                     theList = (List<Ingredient>)bin.Deserialize(stream);
@@ -138,7 +144,7 @@ namespace Shoppinglist
         {
             try
             {
-                using (Stream stream = File.Open("ingredienser.bin", FileMode.Create))
+                using (Stream stream = File.Open("Ingredients.bin", FileMode.Create))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
                     bin.Serialize(stream, theList);

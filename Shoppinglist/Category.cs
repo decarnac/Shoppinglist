@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+
 namespace Shoppinglist
 {
     [Serializable()]
@@ -11,22 +12,22 @@ namespace Shoppinglist
     {
         public Category(string name)
         {
-            Name = name;
+            m_name = name;
         }
 
         public Category(Category kategori)
         {
-            Name = kategori.Name;
+            m_name = kategori.m_name;
         }
 
-        public string Name { get; set; }
+        public string m_name { get; set; }
     }
 
-    class KategoriLista
+    class CategoryList
     {
         public List<Category> theList { get; set; }
 
-        public KategoriLista()
+        public CategoryList()
         {
             //Load();
         }
@@ -37,7 +38,7 @@ namespace Shoppinglist
 
             foreach (Category iterCategory in theList)
             {
-                if (iterCategory.Name == searchString)
+                if (iterCategory.m_name == searchString)
                 {
                     foundCategoriesList.Add(new Category(iterCategory));
                 }
@@ -59,19 +60,19 @@ namespace Shoppinglist
                                             new Category("Frukt"),
                                             new Category("Grönsaker"),
                                             new Category("Mejeri"),
-                                            new Category("Torrvaror"),
                                             new Category("Skafferi"),
                                             new Category("Barn"),
                                             new Category("Godis & Snacks"),
                                             new Category("Städ & Tvätt"),
                                             new Category("Hälsa & Skönhet"),
                                             new Category("Hem & Fritid"),
-                                            new Category("Frysvaror") };
+                                            new Category("Frysvaror"), 
+                                            new Category("Övrigt")};
             };
 
             try
             {
-                using (Stream stream = File.Open("kategori.bin", FileMode.Open))
+                using (Stream stream = File.Open("Category.bin", FileMode.Open))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
                     theList = (List<Category>)bin.Deserialize(stream);
@@ -85,7 +86,7 @@ namespace Shoppinglist
         {
             try
             {
-                using (Stream stream = File.Open("kategori.bin", FileMode.Create))
+                using (Stream stream = File.Open("Category.bin", FileMode.Create))
                 {
                     BinaryFormatter bin = new BinaryFormatter();
                     bin.Serialize(stream, theList);
