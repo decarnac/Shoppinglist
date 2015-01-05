@@ -33,7 +33,7 @@ namespace Shoppinglist
             this.parseIngredientDlgAcceptBtn = new System.Windows.Forms.Button();
             this.parseIngredientDlgDiscardBtn = new System.Windows.Forms.Button();
             this.parseIngredientDlgIngredientsComboBox = new System.Windows.Forms.ComboBox();
-            this.parseIngredientDlgMeasurementComboBox = new System.Windows.Forms.ComboBox();
+            this.parseIngredientDlgUnitComboBox = new System.Windows.Forms.ComboBox();
             this.parseIngredientDlgAmountComboBox = new System.Windows.Forms.TextBox();
             this.parseIngredientDlgUnknownTextBox = new System.Windows.Forms.TextBox();
             this.parseIngredientDlgUnknownGroupBox = new System.Windows.Forms.GroupBox();
@@ -43,7 +43,7 @@ namespace Shoppinglist
             this.parseIngredientExtraInfoLabel = new System.Windows.Forms.Label();
             this.parseIngredientDlgExtraInfoComboBox = new System.Windows.Forms.TextBox();
             this.parseIngredientDlgPluralNameLabel = new System.Windows.Forms.Label();
-            this.parseIngredientDlgMeasurementLabel = new System.Windows.Forms.Label();
+            this.parseIngredientDlgUnitLabel = new System.Windows.Forms.Label();
             this.parseIngredientDlgAmountLabel = new System.Windows.Forms.Label();
             this.parseIngredientDlgNameLabel = new System.Windows.Forms.Label();
             this.parseIngredientDlgUnknownGroupBox.SuspendLayout();
@@ -54,6 +54,7 @@ namespace Shoppinglist
             // 
             this.parseIngredientDlgCategoryComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.parseIngredientDlgCategoryComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.parseIngredientDlgCategoryComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.parseIngredientDlgCategoryComboBox.FormattingEnabled = true;
             this.parseIngredientDlgCategoryComboBox.Location = new System.Drawing.Point(4, 157);
             this.parseIngredientDlgCategoryComboBox.Name = "parseIngredientDlgCategoryComboBox";
@@ -90,16 +91,18 @@ namespace Shoppinglist
             this.parseIngredientDlgIngredientsComboBox.Size = new System.Drawing.Size(300, 21);
             this.parseIngredientDlgIngredientsComboBox.TabIndex = 0;
             this.parseIngredientDlgIngredientsComboBox.SelectedIndexChanged += new System.EventHandler(this.parseIngredientDlgIngredientsComboBox_SelectedIndexChanged);
+            this.parseIngredientDlgIngredientsComboBox.Leave += new System.EventHandler(this.parseIngredientDlgIngredientsComboBox_Leave);
             // 
-            // parseIngredientDlgMeasurementComboBox
+            // parseIngredientDlgUnitComboBox
             // 
-            this.parseIngredientDlgMeasurementComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.parseIngredientDlgMeasurementComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.parseIngredientDlgMeasurementComboBox.FormattingEnabled = true;
-            this.parseIngredientDlgMeasurementComboBox.Location = new System.Drawing.Point(369, 36);
-            this.parseIngredientDlgMeasurementComboBox.Name = "parseIngredientDlgMeasurementComboBox";
-            this.parseIngredientDlgMeasurementComboBox.Size = new System.Drawing.Size(79, 21);
-            this.parseIngredientDlgMeasurementComboBox.TabIndex = 2;
+            this.parseIngredientDlgUnitComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.parseIngredientDlgUnitComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.parseIngredientDlgUnitComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.parseIngredientDlgUnitComboBox.FormattingEnabled = true;
+            this.parseIngredientDlgUnitComboBox.Location = new System.Drawing.Point(369, 36);
+            this.parseIngredientDlgUnitComboBox.Name = "parseIngredientDlgUnitComboBox";
+            this.parseIngredientDlgUnitComboBox.Size = new System.Drawing.Size(79, 21);
+            this.parseIngredientDlgUnitComboBox.TabIndex = 2;
             // 
             // parseIngredientDlgAmountComboBox
             // 
@@ -107,6 +110,7 @@ namespace Shoppinglist
             this.parseIngredientDlgAmountComboBox.Name = "parseIngredientDlgAmountComboBox";
             this.parseIngredientDlgAmountComboBox.Size = new System.Drawing.Size(53, 20);
             this.parseIngredientDlgAmountComboBox.TabIndex = 1;
+            this.parseIngredientDlgAmountComboBox.Leave += new System.EventHandler(this.parseIngredientDlgAmountComboBox_Leave);
             // 
             // parseIngredientDlgUnknownTextBox
             // 
@@ -124,7 +128,7 @@ namespace Shoppinglist
             this.parseIngredientDlgUnknownGroupBox.Size = new System.Drawing.Size(461, 55);
             this.parseIngredientDlgUnknownGroupBox.TabIndex = 9;
             this.parseIngredientDlgUnknownGroupBox.TabStop = false;
-            this.parseIngredientDlgUnknownGroupBox.Text = "Unknown Ingredience";
+            this.parseIngredientDlgUnknownGroupBox.Text = "Unknown Ingredient";
             // 
             // parseIngredientDlgSpecifyGroupBox
             // 
@@ -133,21 +137,21 @@ namespace Shoppinglist
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientExtraInfoLabel);
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgExtraInfoComboBox);
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgPluralNameLabel);
-            this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgMeasurementLabel);
+            this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgUnitLabel);
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgAmountLabel);
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgNameLabel);
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgIngredientsComboBox);
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgCategoryComboBox);
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgAmountComboBox);
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgAcceptBtn);
-            this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgMeasurementComboBox);
+            this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgUnitComboBox);
             this.parseIngredientDlgSpecifyGroupBox.Controls.Add(this.parseIngredientDlgDiscardBtn);
             this.parseIngredientDlgSpecifyGroupBox.Location = new System.Drawing.Point(13, 74);
             this.parseIngredientDlgSpecifyGroupBox.Name = "parseIngredientDlgSpecifyGroupBox";
             this.parseIngredientDlgSpecifyGroupBox.Size = new System.Drawing.Size(461, 187);
             this.parseIngredientDlgSpecifyGroupBox.TabIndex = 10;
             this.parseIngredientDlgSpecifyGroupBox.TabStop = false;
-            this.parseIngredientDlgSpecifyGroupBox.Text = "Specify Ingredience";
+            this.parseIngredientDlgSpecifyGroupBox.Text = "Specify Ingredient";
             // 
             // parseIngredientDlgPluralNameTextBox
             // 
@@ -155,6 +159,7 @@ namespace Shoppinglist
             this.parseIngredientDlgPluralNameTextBox.Name = "parseIngredientDlgPluralNameTextBox";
             this.parseIngredientDlgPluralNameTextBox.Size = new System.Drawing.Size(297, 20);
             this.parseIngredientDlgPluralNameTextBox.TabIndex = 3;
+            this.parseIngredientDlgPluralNameTextBox.Leave += new System.EventHandler(this.parseIngredientDlgPluralNameTextBox_Leave);
             // 
             // parseIngredientCategoryLabel
             // 
@@ -180,6 +185,7 @@ namespace Shoppinglist
             this.parseIngredientDlgExtraInfoComboBox.Name = "parseIngredientDlgExtraInfoComboBox";
             this.parseIngredientDlgExtraInfoComboBox.Size = new System.Drawing.Size(443, 20);
             this.parseIngredientDlgExtraInfoComboBox.TabIndex = 4;
+            this.parseIngredientDlgExtraInfoComboBox.Leave += new System.EventHandler(this.parseIngredientDlgExtraInfoComboBox_Leave);
             // 
             // parseIngredientDlgPluralNameLabel
             // 
@@ -190,14 +196,14 @@ namespace Shoppinglist
             this.parseIngredientDlgPluralNameLabel.TabIndex = 10;
             this.parseIngredientDlgPluralNameLabel.Text = "Plural Name";
             // 
-            // parseIngredientDlgMeasurementLabel
+            // parseIngredientDlgUnitLabel
             // 
-            this.parseIngredientDlgMeasurementLabel.AutoSize = true;
-            this.parseIngredientDlgMeasurementLabel.Location = new System.Drawing.Point(370, 16);
-            this.parseIngredientDlgMeasurementLabel.Name = "parseIngredientDlgMeasurementLabel";
-            this.parseIngredientDlgMeasurementLabel.Size = new System.Drawing.Size(71, 13);
-            this.parseIngredientDlgMeasurementLabel.TabIndex = 8;
-            this.parseIngredientDlgMeasurementLabel.Text = "Measurement";
+            this.parseIngredientDlgUnitLabel.AutoSize = true;
+            this.parseIngredientDlgUnitLabel.Location = new System.Drawing.Point(370, 16);
+            this.parseIngredientDlgUnitLabel.Name = "parseIngredientDlgUnitLabel";
+            this.parseIngredientDlgUnitLabel.Size = new System.Drawing.Size(26, 13);
+            this.parseIngredientDlgUnitLabel.TabIndex = 8;
+            this.parseIngredientDlgUnitLabel.Text = "Unit";
             // 
             // parseIngredientDlgAmountLabel
             // 
@@ -228,7 +234,7 @@ namespace Shoppinglist
             this.Controls.Add(this.parseIngredientDlgUnknownGroupBox);
             this.Name = "parseIngredientDlg";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Specify Ingredience";
+            this.Text = "Specify Ingredient";
             this.parseIngredientDlgUnknownGroupBox.ResumeLayout(false);
             this.parseIngredientDlgUnknownGroupBox.PerformLayout();
             this.parseIngredientDlgSpecifyGroupBox.ResumeLayout(false);
@@ -244,11 +250,10 @@ namespace Shoppinglist
 
         private List<Category> m_categories;
         private List<Ingredient> m_ingredients;
-        private List<Measurement> m_measurement;
-        private int m_amount;
+        private List<Unit> m_unit;
         private System.Windows.Forms.Button parseIngredientDlgDiscardBtn;
         private System.Windows.Forms.ComboBox parseIngredientDlgIngredientsComboBox;
-        private System.Windows.Forms.ComboBox parseIngredientDlgMeasurementComboBox;
+        private System.Windows.Forms.ComboBox parseIngredientDlgUnitComboBox;
         private System.Windows.Forms.TextBox parseIngredientDlgAmountComboBox;
         private System.Windows.Forms.TextBox parseIngredientDlgUnknownTextBox;
         private System.Windows.Forms.GroupBox parseIngredientDlgUnknownGroupBox;
@@ -257,7 +262,7 @@ namespace Shoppinglist
         private System.Windows.Forms.Label parseIngredientExtraInfoLabel;
         private System.Windows.Forms.TextBox parseIngredientDlgExtraInfoComboBox;
         private System.Windows.Forms.Label parseIngredientDlgPluralNameLabel;
-        private System.Windows.Forms.Label parseIngredientDlgMeasurementLabel;
+        private System.Windows.Forms.Label parseIngredientDlgUnitLabel;
         private System.Windows.Forms.Label parseIngredientDlgAmountLabel;
         private System.Windows.Forms.Label parseIngredientDlgNameLabel;
         private System.Windows.Forms.TextBox parseIngredientDlgPluralNameTextBox;

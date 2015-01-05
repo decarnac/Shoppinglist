@@ -54,7 +54,7 @@
     </Compile>
     <Compile Include="Ingredient.cs" />
     <Compile Include="Category.cs" />
-    <Compile Include="Measurement.cs" />
+    <Compile Include="Unit.cs" />
     <Compile Include="parseIngredientPopup.cs">
       <SubType>Form</SubType>
     </Compile>
