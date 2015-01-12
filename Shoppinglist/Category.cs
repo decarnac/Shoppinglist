@@ -67,7 +67,8 @@ namespace Shoppinglist
                                             new Category("Hälsa & Skönhet"),
                                             new Category("Hem & Fritid"),
                                             new Category("Frysvaror"), 
-                                            new Category("Övrigt")};
+                                            new Category("Övrigt"),
+                                            new Category("Ignorera")};
             };
 
             try

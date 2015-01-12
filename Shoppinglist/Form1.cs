@@ -139,7 +139,7 @@ namespace Shoppinglist
             List<string> name_and_extras = new List<string>();
 
             // Use these chars to split row into words below.
-            char[] splitRowDelimiter = new char[] { ' ', '(', ')', '[', ']', '.', ',', '\n' };
+            char[] splitRowDelimiter = new char[] { ' ', '(', ')', '[', ']', '.', '\n' };
 
             // Use these chars to split text into rows below.
             char[] rowEndDelimiter = new char[] { '\n' };
@@ -273,10 +273,17 @@ namespace Shoppinglist
                     currentRowIngredient.m_additionalInfo = "";
                     // TODO
                     // if searchstring contain more than 1 valid Ingredient then the first one will be discarded :/
+                    int searchStringIndex = 0;
                     foreach (string searchstring in name_and_extras)
                     {
                         // Find Ingredient/s with same name
                         List<Ingredient> searchIngredients = m_ingredientList.FindByName(searchstring);
+
+                        // Check for ingredient name containing 2 words
+                        if (searchIngredients.Count == 0 && searchStringIndex < name_and_extras.Count-1)
+                        {
+                            searchIngredients = m_ingredientList.FindByName(name_and_extras[searchStringIndex] + " " + name_and_extras[searchStringIndex + 1]);
+                        }
 
                         if (searchIngredients.Count > 0)
                         {
@@ -297,6 +304,7 @@ namespace Shoppinglist
                             currentRowIngredient.m_name = useThisIngredient.m_name;
                             currentRowIngredient.m_namePlural = useThisIngredient.m_namePlural;
                             currentRowIngredient.m_category = useThisIngredient.m_category;
+                            break;
                         }
                         // Append unused words to additional ingredient info
                         else
@@ -307,6 +315,7 @@ namespace Shoppinglist
                             }
                             currentRowIngredient.m_additionalInfo += searchstring;
                         }
+                        searchStringIndex++;
                     }
 
                     // If this ingredient already have been added, just add to the amount.
